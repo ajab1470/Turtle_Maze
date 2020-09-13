@@ -4,135 +4,78 @@ The actual maze is a graph of Cells.
 Author: Ashley Beckers
 """
 
+from __future__ import annotations
 from dataclasses import dataclass
-from typing import Union
+from typing import Optional, List
 import random
-import math
 
 
 @dataclass()
-class Location:
+class Maze:
     """
-    A representation of a point on a grid
-    row: the row within the grid of this location
-    col: the column within the grid
-    id: the unique cell id
+    The actual maze
+    grid: list of cells
+    width: the width of the grid (in number of cells)
+    height: the height of the grid (in number of cells)
     """
-    row: int
-    col: int
-    id: int
+    grid: List[Cell]
+    width: int
+    height: int
 
-    def __hash__(self):
-        return self.id
+    def get_cell(self, row, col):
+        """
+        gets a cell at a specific place in the grid
+        :param row: the row of the cell to find
+        :param col: the column of the cell to find
+        :return: the cell at that row and column
+        """
+        return self.grid[(row*self.width)+col]
 
 
 @dataclass()
 class Cell:
     """
     A cell in a maze
-    row, col: the coordinates of the cell within the board
-    neighbors: the four cells surrounding the cell (None if this edge of the cell is against the wall of the maze)
+    neighbors: the cells adjacent to this (None if there is no cell or a wall separates the cells)
     walls: the walls of the Cell. True if the wall is present and False if it is not
     """
-    location: 'Location'
-    north_neighbor: Union[None, 'Cell'] = None
-    east_neighbor: Union[None, 'Cell'] = None
-    south_neighbor: Union[None, 'Cell'] = None
-    west_neighbor: Union[None, 'Cell'] = None
+    north_neighbor: Optional[Cell] = None
+    east_neighbor: Optional[Cell] = None
+    south_neighbor: Optional[Cell] = None
+    west_neighbor: Optional[Cell] = None
     north_wall: bool = True
     east_wall: bool = True
     south_wall: bool = True
     west_wall: bool = True
 
-    def __hash__(self):
-        """
-        Hashed based on the cell's unique location id
-        """
-        return self.location.id
-
 
 def make_grid(size):
     """
-    creates a maze grid with no connections between cells.
-    A maze grid is represented as a list of cells
+    creates a maze with no connections between cells.
+    connected cells are adjacent cells with no walls in between
     :param size: the dimension of the square grid
-    :return: a grid of size by size cells
+    :return: a maze with the specified grid
     """
     grid = []
+    maze = Maze(grid,size,size)
+
     for row in range(size):
         for col in range(size):
             # create a cell and add it to the grid
-            loc = Location(row, col, (row*size)+col)
-            cell = Cell(loc)
+            cell = Cell()
             grid.append(cell)
 
             # connect it to the cells around it
-            if col > 0:
-                left = grid[(row*size) + col - 1]
-                cell.west_neighbor = left
-                left.east_neighbor = cell
-            if row > 0:
-                top = grid[((row-1) * size) + col]
-                cell.north_neighbor = top
-                top.south_neighbor = cell
+            # if col > 0:
+            #     left = grid[(row*size) + col - 1]
+            #     cell.west_neighbor = left
+            #     left.east_neighbor = cell
+            # if row > 0:
+            #     top = grid[((row-1) * size) + col]
+            #     cell.north_neighbor = top
+            #     top.south_neighbor = cell
 
-    return grid
-
-
-# Print testers:
+    return maze
 
 
-def print_cell(cell):
-    """
-    a tester to confirm a cell looks right
-    prints in the form:
-    cell location
-        North Location ID
-        East Location ID
-        South Location ID
-        West Location ID
-    :param cell: the cell
-    """
-    print("cell ", cell.location, ":", sep="")
-    print("\tNorth:", end=" ")
 
-    if cell.north_neighbor is not None:
-        print(cell.north_neighbor.location.id)
-    else:
-        print("None")
-    print("\tEast:", end=" ")
-
-    if cell.east_neighbor is not None:
-        print(cell.east_neighbor.location.id)
-    else:
-        print("None")
-    print("\tSouth:", end=" ")
-
-    if cell.south_neighbor is not None:
-        print(cell.south_neighbor.location.id)
-    else:
-        print("None")
-    print("\tWest:", end=" ")
-
-    if cell.west_neighbor is not None:
-        print(cell.west_neighbor.location.id)
-    else:
-        print("None")
-
-
-def print_grid(grid):
-    """
-    a tester to make sure the grid looks right
-    :param grid: the maze grid
-    """
-    size = int(math.sqrt(len(grid)))
-    for row in range(size):
-        print("row ", row, ":", sep="")
-        for col in range(size):
-            print_cell(grid[(row*size)+col])
-        print()
-    print()
-
-
-if __name__ == '__main__':
-    print_grid(make_grid(4))
