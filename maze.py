@@ -146,6 +146,7 @@ def generate_maze(maze):
         wall = walls[wall_ind]
         walls[wall_ind] = walls[-1]
         walls[-1] = wall
+        walls.pop()
         if not wall[1] in visited_cells:
             visited_cells.add(wall[1])
             # get the two cells and calculate their directions to each other
@@ -159,5 +160,4 @@ def generate_maze(maze):
             start[start_dir] = False
             unvisited[unvisited_dir] = False
             add_walls(maze, x2, y2, walls)
-        walls.pop()
 
