@@ -42,10 +42,10 @@ class Cell:
     neighbors: the cells adjacent to this (None if there is no cell or a wall separates the cells)
     walls: the walls of the Cell. True if the wall is present and False if it is not
     """
-    north_neighbor: Optional[Cell] = None
-    east_neighbor: Optional[Cell] = None
-    south_neighbor: Optional[Cell] = None
-    west_neighbor: Optional[Cell] = None
+    # north_neighbor: Optional[Cell] = None
+    # east_neighbor: Optional[Cell] = None
+    # south_neighbor: Optional[Cell] = None
+    # west_neighbor: Optional[Cell] = None
     north_wall: bool = True
     east_wall: bool = True
     south_wall: bool = True
@@ -57,11 +57,11 @@ class Cell:
         :param item: a tuple of (deltaX, deltaY)
         :return: the specified wall
         """
-        if item == (0,1):
+        if item == (0,-1):
             return self.north_wall
         elif item == (1,0):
             return self.east_wall
-        elif item == (0,-1):
+        elif item == (0,1):
             return self.south_wall
         elif item == (-1,0):
             return self.west_wall
@@ -69,11 +69,11 @@ class Cell:
             return None
 
     def __setitem__(self, key, value):
-        if key == (0,1):
+        if key == (0,-1):
             self.north_wall = value
         elif key == (1, 0):
             self.east_wall = value
-        elif key == (0, -1):
+        elif key == (0, 1):
             self.south_wall = value
         elif key == (-1, 0):
             self.west_wall = value
@@ -95,16 +95,6 @@ def make_grid(size):
             # create a cell and add it to the grid
             cell = Cell()
             grid.append(cell)
-
-            # connect it to the cells around it
-            # if col > 0:
-            #     left = grid[(row*size) + col - 1]
-            #     cell.west_neighbor = left
-            #     left.east_neighbor = cell
-            # if row > 0:
-            #     top = grid[((row-1) * size) + col]
-            #     cell.north_neighbor = top
-            #     top.south_neighbor = cell
 
     return maze
 
@@ -146,17 +136,18 @@ def generate_maze(maze):
     walls = []
     visited_cells = set()
     # get a random cell from the maze
-    rand_x = random.choice(range(maze.width))
-    rand_y = random.choice(range(maze.height))
+    rand_x = random.randrange(maze.width)
+    rand_y = random.randrange(maze.height)
     visited_cells.add((rand_x, rand_y))
     add_walls(maze, rand_x, rand_y, walls)
     # loop until there are no walls left
     while walls:
-        wall_ind = random.choice(range(len(walls)))
+        wall_ind = random.randrange(len(walls))
         wall = walls[wall_ind]
         walls[wall_ind] = walls[-1]
         walls[-1] = wall
         if not wall[1] in visited_cells:
+            visited_cells.add(wall[1])
             # get the two cells and calculate their directions to each other
             x1, y1 = wall[0]
             x2, y2 = wall[1]
@@ -169,3 +160,4 @@ def generate_maze(maze):
             unvisited[unvisited_dir] = False
             add_walls(maze, x2, y2, walls)
         walls.pop()
+
